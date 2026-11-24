@@ -589,7 +589,7 @@ h2.h2 { margin: 28px 0 0; font-family: var(--font-display); font-weight: 700; fo
 
     <section id="v-abu" class="view" hidden aria-label="المساعد">
       <h1 class="h abu-nm">أبو حميد</h1>
-      <p class="sub">مساعدك في الصكة. يسمع أوامرك، يعرف حساب المشاريع في البلوت، ويسجّل النقاط للفريق الذي تذكره. يرد كتابة على الشاشة فقط.</p>
+      <p class="sub">مساعدك في الصكة وفي التطبيق كله. يسمع أوامرك، يعرف حساب المشاريع في البلوت، ويسجّل النقاط للفريق الذي تذكره، ويقدر يغيّر الألوان والأسماء والإعدادات ويفتح أي صفحة بصوتك. يرد كتابة على الشاشة فقط.</p>
 
       <h2 class="h2">إعدادات المساعد</h2>
       <div class="field">
@@ -863,11 +863,11 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   }
 
   var ITEMS = [
-    { k: 'kaboot', label: 'كبوت', re: /^(?:كبوت|قبوت|كابوت|كبوط|كبووت)$/, def: 'sun' },
+    { k: 'kaboot', label: 'كبوت', re: /^(?:كبوت|قبوت|كابوت|كبوط|كبووت|كبود|قبود|كابت|قابوت)$/, def: 'sun' },
     { k: 'arbaa', label: 'أربعمية', re: /^(?:اربعميه|اربعمايه|اربعمييه|اربعميت)$/, fix: 'sun' },
-    { k: 'balot', label: 'بلوت', re: /^(?:بلوت|بلات|بلوط)$/, fix: 'hokm' },
-    { k: 'qeid', label: 'قيد', re: /^(?:قيد|قيده|قيدها)$/, def: 'sun' },
-    { k: 'sra', label: 'سرا', re: /^(?:سرا|سري|سره|سراء|سرع)$/, need: true },
+    { k: 'balot', label: 'بلوت', re: /^(?:بلوت|بلات|بلوط|بلود|بالوت|بلوتو)$/, fix: 'hokm' },
+    { k: 'qeid', label: 'قيد', re: /^(?:قيد|قيده|قيدها|قيت|كيد|قايد)$/, def: 'sun' },
+    { k: 'sra', label: 'سرا', re: /^(?:سرا|سري|سره|سراء|سرع|صرا|سراه)$/, need: true },
     { k: 'khamsin', label: 'خمسين', re: /^(?:خمسين|خمسون)$/, need: true, ctxOnly: true },
     { k: 'miya', label: 'مية', re: /^(?:ميه|مايه|مييه|ميت)$/, need: true, ctxOnly: true }
   ];
@@ -1085,6 +1085,7 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       case 'err': tone(240, t, 0.16, 'triangle', 0.25, 170); break;
       case 'micon': tone(520, t, 0.1, 'sine', 0.2, 780); break;
       case 'micoff': tone(780, t, 0.1, 'sine', 0.2, 520); break;
+      case 'wake': tone(880, t, 0.07, 'sine', 0.2, 1320); tone(1320, t + 0.06, 0.09, 'sine', 0.14); break;
       case 'nav': tone(1100, t, 0.03, 'sine', 0.1, 800); break;
       case 'lock':
         tone(180, t, 0.16, 'square', 0.16, 90); noise(t, 0.06, 0.3, 900, 2);
@@ -1459,6 +1460,359 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
     msg('تمام، صار اسمي «' + name + '». ناديني به وأنا حاضر.', 'ok'); sfx('chime');
   }
 
+  /* ---------- التحكم الصوتي بكل التطبيق (فهم محلي سريع، بدون إنترنت) ---------- */
+  var curView = 'calc';
+  var V_OFF = /(?:^| )(?:وقف|اوقف|طفي|اطفي|اطفيه|طفيه|بطل|ايقاف|الغ|الغي|الغاء|عطل|اقفل|سكر|اسكت|اكتم|كتم|بدون|لا تشغل|ما تشغل)(?: |$)/;
+  var V_ON = /(?:^| )(?:شغل|شغلي|اشغل|اشغلي|شغلها|فعل|فعلي|فعلها|ابدا|ركب|وصل|رجع|رجعها|فك)(?: |$)/;
+  var CHG = /(?:^| )(?:غير|غيري|بدل|بدلي|عدل|عدلي|اختار|خل|خلي|اجعل|صير|حط|حطي)(?: |$)/;
+  var NAV_V = /(?:^| )(?:افتح|افتحي|روح|روحي|ودني|وديني|خذني|اذهب|انتقل|ارجع|رجعني|اعرض|اظهر|ورني|وريني|ابغي|ابي|ابغا|ابغاك|دخلني|ادخل|طلع|طلعلي)(?: |$)/;
+  var NAV_T = [
+    ['abu', /(?:^| )(?:ال)?مساعد(?: |$)|(?:^| )(?:ال)?اوامر(?: |$)|اوامرك/],
+    ['set', /(?:^| )(?:ال)?(?:اعدادات|ضبط|خيارات)(?: |$)/],
+    ['rules', /(?:^| )(?:ال)?(?:قوانين|قانون|احكام)(?: |$)|(?:^| )الفهرس(?: |$)/],
+    ['teams', /(?:^| )(?:ال)?(?:فرق|فريق|اسماء)(?: |$)/],
+    ['calc', /(?:^| )(?:ال)?(?:حاسبه|رئيسيه)(?: |$)|الصفحه الرئيسيه|الصفحه الاولي|(?:^| )البدايه(?: |$)/]
+  ];
+  var VIEW_N = { calc: 'الحاسبة', teams: 'الفرق', rules: 'القوانين', abu: 'المساعد', set: 'الإعدادات' };
+  var LAW_N = { 'الاول': 1, 'اول': 1, 'الاولي': 1, 'واحد': 1, '1': 1, 'الثاني': 2, 'ثاني': 2, 'اثنين': 2, '2': 2, 'الثالث': 3, 'ثالث': 3, 'ثلاثه': 3, '3': 3, 'الرابع': 4, 'رابع': 4, 'اربعه': 4, '4': 4, 'الخامس': 5, 'خامس': 5, 'خمسه': 5, '5': 5 };
+  var RT1 = /(?:^|\s)(?:غير|غيري|بدل|بدلي|عدل|عدلي|سم|سمي|سمو|خل|خلي|اجعل|صير)\s+(?:اسم\s+)?(.+?)\s+(?:الى|إلى|الي|إلي|هو|اسمه|اسمها|صار|يصير|ليكون|ل)\s+(.+)$/;
+  var RT2 = /(?:^|\s)(?:سم|سمي|سمو)\s+(فريق(?:نا|هم)?(?:\s+(?:لنا|لهم|الاول|الأول|الثاني))?|لنا|لهم)\s+(.+)$/;
+
+  function hsl2hex(h, s, l) {
+    s /= 100; l /= 100;
+    var a = s * Math.min(l, 1 - l);
+    function f(n) { var k = (n + h / 30) % 12, c = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return ('0' + Math.round(255 * c).toString(16)).slice(-2); }
+    return '#' + f(0) + f(8) + f(4);
+  }
+  // لون الخلفية يُغمَّق تلقائياً في التطبيق، فالمهم هو درجة اللون نفسها
+  var COLORS = [
+    { k: 'كحلي', w: ['ازرق غامق', 'كحلي', 'كحل'], bg: '#0a1634', ai: '#6f8fe8' },
+    { k: 'سماوي', w: ['ازرق فاتح', 'سماوي', 'تركوازي', 'فيروزي', 'سيان'], bg: hsl2hex(192, 70, 26), ai: '#6fd3e8' },
+    { k: 'أزرق', w: ['ازرق', 'زرقاء', 'زرق'], bg: hsl2hex(212, 70, 26), ai: '#7fb2ff' },
+    { k: 'بحري', w: ['بحري'], bg: '#0b2a38', ai: '#5fb3c9' },
+    { k: 'زمردي', w: ['زمردي'], bg: '#0b2a22', ai: '#4fd1a5' },
+    { k: 'أخضر', w: ['اخضر', 'خضراء', 'خضر'], bg: hsl2hex(140, 70, 26), ai: '#6fcf9f' },
+    { k: 'أصفر', w: ['اصفر', 'صفراء'], bg: hsl2hex(48, 70, 26), ai: '#f0d85a' },
+    { k: 'برتقالي', w: ['برتقالي', 'برتقال'], bg: hsl2hex(24, 70, 26), ai: '#f0a15a' },
+    { k: 'عنابي', w: ['عنابي', 'نبيتي', 'خمري', 'بوردو', 'قرمزي'], bg: '#2a0f1c', ai: '#e06a8f' },
+    { k: 'أحمر', w: ['احمر', 'حمراء'], bg: hsl2hex(355, 70, 26), ai: '#f07a7a' },
+    { k: 'وردي', w: ['وردي', 'بينك', 'زهري'], bg: hsl2hex(330, 65, 26), ai: '#f08fb0' },
+    { k: 'بنفسجي', w: ['بنفسجي', 'موف', 'ارجواني', 'لافندر', 'بنفسج'], bg: '#1d1236', ai: '#b79af0' },
+    { k: 'بني', w: ['بني', 'اسمر', 'قهوه', 'قهوي', 'شوكولاته'], bg: hsl2hex(25, 55, 24), ai: '#c99a6b' },
+    { k: 'فحمي', w: ['فحمي', 'رمادي', 'اسود', 'سوداء'], bg: '#16161c', ai: '#c9c9d4' },
+    { k: 'ذهبي', w: ['ذهبي', 'دهبي', 'ذهب', 'دهب'], bg: hsl2hex(42, 60, 24), ai: '#d3ac57' },
+    { k: 'أبيض', w: ['ابيض', 'بيضاء'], bg: null, ai: '#ece6d6' },
+    { k: 'الأساسي', w: ['افتراضي', 'الاساسي', 'الاصلي', 'الاصل', 'القديم', 'العادي', 'الطبيعي'], bg: '#0a1634', ai: '#d3ac57' }
+  ];
+  COLORS.forEach(function (c) { c.re = new RegExp('(?:^| )[بلو]?(?:ال)?(?:' + c.w.join('|') + ')(?: |$)'); });
+  function findColor(t) { for (var i = 0; i < COLORS.length; i++) if (COLORS[i].re.test(t)) return COLORS[i]; return null; }
+  function setBg(c) {
+    if (!c.bg) { msg('الخلفية تبقى داكنة عشان الكلام يبان. جرّب لوناً غامقاً مثل أزرق أو بنفسجي.', 'warn'); sfx('err'); return; }
+    S.bg = c.bg; save(); applyTheme(); markSw($('#bgSw'), 'bg'); sfx('chime');
+    msg('غيّرت لون الخلفية إلى ' + c.k + '.', 'ok');
+  }
+  function setAbuColor(c) {
+    S.abuColor = c.ai; save(); applyTheme(); markSw($('#abuSw'), 'abuColor'); sfx('chime');
+    msg('صار لوني ' + c.k + '.', 'ok');
+  }
+  function colorTarget(raw, t) {
+    if (/(?:^| )لونك(?: |$)|(?:^| )(?:ال)?لون (?:ال)?مساعد|(?:^| )(?:ال)?مساعد.*لون/.test(t)) return 'abu';
+    if (/خلفيه|(?:^| )(?:ال)?تطبيق(?: |$)/.test(t)) return 'bg';
+    if (/(?:^| )(?:ال)?لون(?: |$)/.test(t)) {
+      var tk = norm(raw).split(' '), li = -1, i;
+      for (i = 0; i < tk.length; i++) if (/^(?:ال)?لون$/.test(tk[i])) { li = i; break; }
+      var hits = wakeScan(tk);
+      for (i = 0; i < hits.length; i++) if (li >= 0 && hits[i][0] > li && hits[i][0] - li <= 2) return 'abu';
+      return 'bg';
+    }
+    return null;
+  }
+  function stripWakeWords(str) {
+    var tk = String(str).split(' ').filter(Boolean), nt = tk.map(norm), hits = wakeScan(nt), skip = {}, out = [], i;
+    hits.forEach(function (h) { for (i = h[0]; i < h[1]; i++) skip[i] = true; });
+    for (i = 0; i < tk.length; i++) if (!skip[i]) out.push(tk[i]);
+    return out.join(' ').trim();
+  }
+  function mk(fn, early) { return { run: fn, early: early !== false }; }
+  function askPending(q, fn) {
+    pending = { kind: 'ctl', fn: fn, exp: Date.now() + 14000 };
+    msg(q, 'ask'); sfx('ask');
+  }
+  function goView(v, lawNo) {
+    if (v === 'rules') { rp = (lawNo >= 1 && lawNo <= LAWS.length) ? lawNo - 1 : -1; renderRules(); }
+    showView(v); sfx('nav');
+    msg(v === 'rules' && rp >= 0 ? 'فتحت القانون ' + ORD[rp] + ': ' + LAWS[rp].title : 'فتحت ' + VIEW_N[v] + '.', 'ok');
+  }
+  function lawStep(delta) {
+    var n = rp + delta;
+    if (n < 0 || n >= LAWS.length) { msg(delta > 0 ? 'هذا آخر قانون.' : 'هذا أول قانون.', 'warn'); sfx('err'); return; }
+    rp = n; renderRules(); window.scrollTo(0, 0); sfx('nav');
+    msg('القانون ' + ORD[rp] + ': ' + LAWS[rp].title, 'ok');
+  }
+  function setVol(v, label) {
+    S.vol = Math.max(0.1, Math.min(1, v));
+    $('#vol').value = S.vol; if (master) master.gain.value = S.vol; save(); sfx('click');
+    msg(label + ' (' + Math.round(S.vol * 100) + '٪)', 'ok');
+  }
+  function setFlag(key, val, okOn, okOff) {
+    S[key] = val; save(); syncSettingsUI(); sfx('chime');
+    msg(val ? okOn : okOff, 'ok');
+  }
+
+  // يرجع { run, early } إذا كان الكلام أمراً للتطبيق نفسه (لا للنقاط)، بدون أي تنفيذ قبل run
+  function ctlFind(t, raw, pl) {
+    if (!t) return null;
+    var names = [nm(0), nm(1)], m, i, d;
+    var plain = String(raw).replace(/[ً-ٰٟـ]/g, '').replace(/\s+/g, ' ').trim();
+    var tk = t.split(' ');
+    var off = V_OFF.test(t), on = !off && V_ON.test(t);
+    var scoring = !!(pl && pl.entries && pl.entries.length);
+
+    // 1) تسمية فريق: «غيّر اسم لنا إلى الصقور»، «سمّ فريقنا النسور»
+    m = RT1.exec(plain) || RT2.exec(plain);
+    if (m) {
+      var th = detectTeams(norm(m[1]).split(' ').filter(Boolean), names);
+      var nn = stripWakeWords(m[2].replace(/[.,،؟?!؛:"«»]+/g, ' ').replace(/\s+/g, ' ').trim());
+      if (th.team !== null && !th.both && nn && !RENAME_NO.test(nn)) {
+        var tm = th.team;
+        return mk(function () {
+          if (nn.length > 18) { msg('الاسم طويل. اختر اسماً من 18 حرفاً أو أقل.', 'warn'); sfx('err'); return; }
+          S.names[tm] = nn; syncNames(tm, null); save(); render(); sfx('chime');
+          msg('تمام، صار اسم الفريق «' + nn + '».', 'ok');
+        }, false);
+      }
+    }
+
+    // 2) ألوان: الخلفية أو لون المساعد
+    var tgt = colorTarget(raw, t);
+    if (tgt && !/متحرك|حركه/.test(t)) {
+      var c = findColor(t);
+      if (c) return mk(function () { if (tgt === 'abu') setAbuColor(c); else setBg(c); });
+      if (CHG.test(t)) {
+        return mk(function () {
+          askPending('أي لون؟ قل مثلاً: أزرق، أخضر، بنفسجي، عنابي، وردي، برتقالي…', function (b) {
+            var c2 = findColor(b);
+            if (!c2) return false;
+            if (tgt === 'abu') setAbuColor(c2); else setBg(c2);
+            return true;
+          });
+        });
+      }
+    }
+
+    // 3) الخلفية المتحركة
+    var still = /(?:^| )(?:ثبت|ثبتها|ثابته|ثابت|ساكنه|ساكن)(?: |$)/.test(t);
+    if ((/متحرك|حركه/.test(t)) || (still && /خلفيه/.test(t))) {
+      var wantAnim = (off || still) ? false : on ? true : !S.anim;
+      return mk(function () { setFlag('anim', wantAnim, 'شغّلت الخلفية المتحركة.', 'أوقفت الخلفية المتحركة.'); });
+    }
+
+    // 4) الصوت والمؤثرات
+    if (/(?:^| )(?:ال)?(?:صوت|اصوات|موثرات)/.test(t) && !/(?:^| )صوتي(?: |$)/.test(t)) {
+      var nums = parseNums(tk), up = /(?:^| )(?:ارفع|ارفعي|زود|زيد|زودي|اعلي|كبر|قوي|عالي)(?: |$)/.test(t), down = /(?:^| )(?:خفض|خفضي|نزل|نزلي|وطي|وطا|قلل|صغر|خفف|هدي|اهدي)(?: |$)/.test(t);
+      if (nums.length && nums[0].v >= 1 && nums[0].v <= 100 && !off) {
+        var nv = nums[0].v;
+        if (up) return mk(function () { setVol(S.vol + nv / 100, 'رفعت الصوت'); });
+        if (down) return mk(function () { setVol(S.vol - nv / 100, 'خفضت الصوت'); });
+        return mk(function () { setVol(nv / 100, 'ضبطت الصوت'); });
+      }
+      if (up) return mk(function () { setVol(S.vol + 0.15, 'رفعت الصوت'); });
+      if (down) return mk(function () { setVol(S.vol - 0.15, 'خفضت الصوت'); });
+      if (/(?:^| )(?:اقصي|الاقصي|اخره|الاخر|ماكس|الحد الاعلي)(?: |$)/.test(t)) return mk(function () { setVol(1, 'الصوت على الأقصى'); });
+      if (/(?:^| )(?:ادني|الادني|اقل|الحد الادني)(?: |$)/.test(t)) return mk(function () { setVol(0.1, 'الصوت على الأدنى'); });
+      if (off) return mk(function () { setFlag('sfx', false, 'شغّلت المؤثرات.', 'أطفأت المؤثرات الصوتية.'); });
+      if (on) return mk(function () { setFlag('sfx', true, 'شغّلت المؤثرات الصوتية.', ''); });
+    }
+
+    // 5) الاهتزاز
+    if (/(?:^| )(?:ال)?(?:اهتزاز|هزاز)|(?:^| )(?:يهتز|اهتز)(?: |$)/.test(t) && (off || on)) {
+      var wantVibe = on;
+      return mk(function () { setFlag('vibe', wantVibe, 'شغّلت الاهتزاز.', 'أوقفت الاهتزاز.'); });
+    }
+
+    // 6) إبقاء الشاشة شغالة
+    if (/(?:^| )(?:ال)?شاشه(?: |$)/.test(t) && /(?:شغاله|شغال|مفتوحه|منوره|مضاءه|تنطفي|تطفي|تقفل|تنام|ابقي|ابقيها|خلي|خل|ثبت|تظل|تبقي|ديم|دايما|عادي|عاديه|الغ|الغي)/.test(t)) {
+      var wantAwake = !/(?:^| )(?:الغ|الغي|عادي|عاديه|عطل|ايقاف)(?: |$)/.test(t);
+      return mk(function () { setFlag('awake', wantAwake, 'تمام، الشاشة تبقى شغالة.', 'رجعت الشاشة لوضعها العادي.'); });
+    }
+
+    // 7) هل يلزم النداء باسمه؟
+    if (/(?:^| )(?:ال)?نداء(?: |$)|(?:^| )(?:ناديك|اناديك|تنادي|انادي)(?: |$)/.test(t)) {
+      var neg = /(?:^| )(?:بدون|ما|لا|مو)(?: |$)/.test(t);
+      var pos = /(?:^| )(?:اشترط|لازم|الزم|يلزم|ضروري|فعل|شغل|ارجع|رجع)(?: |$)/.test(t);
+      if (neg || pos) {
+        var wantWake = !neg;
+        return mk(function () { setFlag('abuWake', wantWake, 'تمام، ما أستجيب إلا إذا ناديتني باسمي.', 'تمام، أستجيب بدون نداء. قل «لازم أناديك» لإرجاعه.'); });
+      }
+    }
+
+    // 8) قيم الحساب
+    var t2 = t.replace(/اربعه? ?(?:ميه|مايه|مييه)/g, 'اربعميه');
+    var tk2 = t2.split(' ');
+    if (/(?:^| )قيمه(?: |$)/.test(t2)) {
+      var it = null, iv = -1;
+      for (i = 0; i < tk2.length && !it; i++) for (d = 0; d < ITEMS.length; d++) if (ITEMS[d].re.test(tk2[i]) || ITEMS[d].re.test(tk2[i].replace(/^ال/, ''))) { it = ITEMS[d]; iv = i; break; }
+      if (it) {
+        var mm = tk2.slice(); mm[iv] = '#';
+        var row = null;
+        for (i = 0; i < VAL_ROWS.length; i++) if (VAL_ROWS[i][0] === it.k) row = VAL_ROWS[i];
+        var cx = [];
+        tk2.forEach(function (w) { if (RE_HOKM.test(w)) cx.push('hokm'); else if (RE_SUN.test(w)) cx.push('sun'); });
+        tk2.forEach(function (w, ix) { if (RE_HOKM.test(w) || RE_SUN.test(w)) mm[ix] = '#'; });
+        var ng = parseNums(mm);
+        if (row && ng.length && ng[0].v >= 0 && ng[0].v <= 300) {
+          var val = ng[0].v, ctxs = cx.length ? cx.filter(function (x, ix, a) { return a.indexOf(x) === ix && row[2].indexOf(x) >= 0; }) : row[2];
+          if (ctxs.length) {
+            return mk(function () {
+              ctxs.forEach(function (cc) { if (!S.vals[it.k]) S.vals[it.k] = {}; S.vals[it.k][cc] = val; });
+              save(); renderVals(); renderCmds(); sfx('chime');
+              msg('تمام، قيمة «' + it.label + '» ' + ctxs.map(function (cc) { return 'في ' + CTX_L[cc]; }).join(' و') + ' صارت ' + val + '.', 'ok');
+            });
+          }
+        }
+      }
+    }
+    if (/(?:^| )(?:رجع|ارجع|اعد|رد|ردي)(?: |$)/.test(t) && /(?:^| )(?:ال)?قيم(?: |$)/.test(t)) {
+      return mk(function () { S.vals = {}; save(); renderVals(); renderCmds(); sfx('chime'); msg('رجّعت قيم الحساب للأصل.', 'ok'); });
+    }
+
+    // 9) تصفير عدد الصكات (بتأكيد)
+    if (/(?:^| )(?:صفر|صفري|امسح|مسح|احذف|الغ|الغي)(?: |$)/.test(t) && /(?:^| )(?:ال)?صكات(?: |$)/.test(t)) {
+      return mk(function () {
+        askPending('أصفّر عدد الصكات للفريقين؟ قل «تأكيد».', function (b, p) {
+          if (p.intent !== 'confirm') return false;
+          S.wins = [0, 0]; save(); render(); sfx('chime'); msg('صفّرت عدد الصكات.', 'ok');
+          return true;
+        });
+      });
+    }
+
+    // 10) كم باقي للفوز
+    if (/(?:^| )(?:كم|وش|ايش|شكثر|كثر) (?:باقي|ناقص|ينقص|يبقي|تبقي|بقي|الباقي)|(?:^| )(?:الباقي|المتبقي|المتبقيه)(?: |$)/.test(t)) {
+      var sub = detectTeams(tk, names);
+      return mk(function () {
+        function rem(x) { return nm(x) + ': ' + (S.scores[x] >= TARGET ? 'وصل ' + TARGET : 'باقي ' + (TARGET - S.scores[x])); }
+        msg(sub.team !== null && !sub.both ? rem(sub.team) : rem(0) + ' · ' + rem(1), 'ok'); sfx('chime');
+      });
+    }
+
+    // 11) التنقل بين الصفحات (النقاط أولى، فلا نتدخل إذا الكلام تسجيل)
+    if (!scoring) {
+      if (curView === 'rules') {
+        if (rp >= 0 && /(?:^| )(?:التالي|التاليه|القادم|الجاي|بعده)(?: |$)/.test(t)) return mk(function () { lawStep(1); });
+        if (rp >= 0 && /(?:^| )(?:السابق|السابقه|قبله|اللي قبله)(?: |$)/.test(t)) return mk(function () { lawStep(-1); });
+        if (rp >= 0 && /(?:^| )(?:الفهرس|القائمه)(?: |$)/.test(t)) return mk(function () { goView('rules', -1); });
+      }
+      var navv = NAV_V.test(t), brief = tk.length <= 2;
+      if (navv || brief) {
+        for (i = 0; i < NAV_T.length; i++) {
+          if (NAV_T[i][1].test(t)) {
+            var vv = NAV_T[i][0], ln = 0;
+            if (vv === 'rules') for (d = 0; d < tk.length; d++) if (LAW_N[tk[d]]) { ln = LAW_N[tk[d]]; break; }
+            return mk(function () { goView(vv, ln); });
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /* ---------- نص الكلام: أفضل بديل، وتنفيذ مبكر بدون انتظار ---------- */
+  var ackAt = 0, wakeFlag = false, uttDone = false, uttText = '', partTimer = 0, lastFinN = '';
+  function altScore(t) {
+    var n = norm(t);
+    if (!n) return -1;
+    var s = wakeHas(n) ? 3 : 0, body = wakeStrip(n), pl = parse(t, [nm(0), nm(1)]);
+    if (pl.intent) s += 3;
+    s += Math.min(pl.entries.length, 3) * 2;
+    if (pl.team !== null) s += 1;
+    if (body && ctlFind(body, t, pl)) s += 4;
+    return s;
+  }
+  function bestText(e) {
+    if (!e) return '';
+    var alts = e.alts && e.alts.length > 1 ? e.alts : null;
+    if (!alts) return e.text || '';
+    var best = alts[0], bs = altScore(alts[0]);
+    for (var i = 1; i < alts.length; i++) {
+      var sc = altScore(alts[i]) - i * 0.01;
+      if (sc > bs + 0.5) { best = alts[i]; bs = sc; }
+    }
+    return best;
+  }
+  function gateOpen(n) {
+    var now = Date.now();
+    return !S.abuWake || wakeHas(n) || now < attn || !!(pending && now < pending.exp);
+  }
+  function isReady(t) {            // هل الكلام مفهوم أو لا يستحق الانتظار؟
+    var n = norm(t);
+    if (!n) return true;
+    if (!gateOpen(n)) return true; // سيُتجاهل على كل حال
+    var body = wakeStrip(n);
+    if (!body) return true;        // نداء فقط: نرد فوراً
+    if (renameOf(t)) return true;
+    var pl = parse(t, [nm(0), nm(1)]);
+    if (pl.intent || pl.entries.length) return true;
+    if (pending && pl.team !== null) return true;
+    if (pending && pending.kind === 'ctl') return true;
+    return !!ctlFind(body, t, pl);
+  }
+  function looksDone(t) {          // هل النص المؤقت أمر كامل ننفذه الآن؟
+    var n = norm(t);
+    if (!n || !gateOpen(n)) return false;
+    var body = wakeStrip(n);
+    if (!body) return false;
+    if (renameOf(t)) return false; // الأسماء تؤخذ من النص النهائي فقط
+    var last = body.split(' ').pop();
+    if (/^(?:في|ب|و|الي|الى|ل|علي|ال|لل|مع|من)$/.test(last)) return false;
+    var pl = parse(t, [nm(0), nm(1)]);
+    var cm = ctlFind(body, t, pl);
+    if (cm) return cm.early;
+    if (pending && pending.kind === 'ctl') return true;
+    return !!(pl.intent || pl.entries.length || (pending && pl.team !== null));
+  }
+  function stableMs(t) {
+    var tk = norm(t).split(' '), last = tk[tk.length - 1] || '';
+    return (numTok(last) || /^\d+$/.test(last)) ? 750 : 380;
+  }
+  function onPartialText(e) {
+    var t = bestText(e);
+    if (!t) return;
+    heard(t + ' …');
+    var now = Date.now();
+    if (!wakeFlag && S.abuWake && wakeHas(norm(t))) {
+      wakeFlag = true; attn = now + 12000;
+      if (now - ackAt > 1500) { ackAt = now; sfx('wake'); msg('تفضل، أسمعك…', 'ask'); }
+    }
+    if (uttDone) return;
+    clearTimeout(partTimer); partTimer = 0;
+    if (!looksDone(t)) return;
+    partTimer = setTimeout(function () {
+      partTimer = 0;
+      if (uttDone) return;
+      uttDone = true; uttText = norm(t);
+      handle(t, false);
+    }, stableMs(t));
+  }
+  function onFinalText(e) {
+    var txt = bestText(e);
+    clearTimeout(partTimer); partTimer = 0;
+    var wasDone = uttDone, done = uttText;
+    uttDone = false; uttText = ''; wakeFlag = false;
+    if (!txt || !norm(txt)) return;
+    if (wasDone) {                  // نفذناه من النص المؤقت: لا نكرره، ونأخذ الزيادة فقط
+      var f = norm(txt);
+      if (f.indexOf(done) === 0) txt = f.slice(done.length).trim();
+      else if (lev(f, done) <= Math.max(3, Math.round(done.length * 0.3))) txt = '';
+      if (!txt) return;
+    }
+    var full = buf ? buf + ' ' + txt : txt;
+    clearTimeout(bufTimer); bufTimer = 0; buf = '';
+    if (isReady(full)) { handle(full, false); return; }
+    buf = full;                     // جزء ناقص: ننتظر بقية الجملة قليلاً
+    bufTimer = setTimeout(function () { var b = buf; buf = ''; bufTimer = 0; if (b) handle(b, false); }, 800);
+  }
+
   function handle(raw, typed) {
     var text = norm(raw);
     if (!text) return;
@@ -1470,18 +1824,22 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
     heard(String(raw).trim());
     if (pending && now >= pending.exp) pending = null;
     var body = wakeStrip(text);
-    if (!body) { msg('تفضل، أسمعك.', 'ask'); sfx('chime'); return; }
+    if (!body) { msg('تفضل، أسمعك.', 'ask'); if (now - ackAt > 2500) sfx('wake'); ackAt = now; return; }
     var rn = renameOf(raw);
     if (rn) { doRename(rn); return; }
     var names = [nm(0), nm(1)];
     var pl = parse(raw, names);
+    var cm = ctlFind(body, raw, pl);
 
     if (pending) {
       var pd = pending;
-      if (pl.intent === 'cancel' || (pl.intent === 'undo' && pd.kind !== 'confirm' && /^(?:الغ|الغي|الغاء)$/.test(body))) {
+      if (pl.intent === 'cancel' || (!cm && pl.intent === 'undo' && pd.kind !== 'confirm' && /^(?:الغ|الغي|الغاء)$/.test(body))) {
         pending = null; msg('تمام، ألغيت.', 'ok'); return;
       }
-      if (pd.kind === 'confirm') {
+      if (pd.kind === 'ctl') {
+        pending = null;
+        if (pd.fn(body, pl, raw)) return;
+      } else if (pd.kind === 'confirm') {
         if (pl.intent === 'confirm') { pending = null; newGame(); msg('بدأت صكة جديدة. بالتوفيق.', 'ok'); sfx('chime'); return; }
       } else if (pd.kind === 'team' && pl.team !== null && !pl.entries.length && !pl.intent) {
         pending = null; pd.pl.team = pl.team; pd.pl.vict = pd.pl.vict || pl.vict; runPlan(pd.pl); return;
@@ -1497,13 +1855,14 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       pending = null;
     }
 
+    if (cm) { cm.run(); return; }
     if (pl.intent === 'undo') {
       if (undo()) { msg('تراجعت عن آخر قيد.\n' + statusText(), 'ok'); } else { msg('ما فيه شيء أتراجع عنه.', 'warn'); sfx('err'); }
       return;
     }
     if (pl.intent === 'newgame') { requestNewGame(); return; }
     if (pl.intent === 'status') { msg(statusText() + (S.over === null ? '' : '\nالصكة انتهت.'), 'ok'); sfx('chime'); return; }
-    if (pl.intent === 'help') { msg('الأوامر وقيم الحساب في تبويب «المساعد».', 'ok'); return; }
+    if (pl.intent === 'help') { msg('أسجّل النقاط، وأغيّر لون الخلفية ولوني، وأفتح أي صفحة، وأغيّر أسماء الفرق وقيم الحساب والصوت والإعدادات. كل الأمثلة في تبويب «المساعد».', 'ok'); return; }
     if (pl.intent === 'kasho') { msg('كاشو: تُعاد الصكة بدون نقاط، وما سجلت شيء.', 'ok'); sfx('chime'); return; }
     if (pl.intent === 'confirm' || pl.intent === 'cancel') { msg('ما عندي شيء ينتظر تأكيد.', 'warn'); return; }
     if (pl.both && pl.entries.length) { msg('ذكرت الفريقين في أمر واحد. أعطني أمراً لكل فريق.', 'warn'); sfx('err'); return; }
@@ -1546,13 +1905,9 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
     }, Math.min(350 * reTries, 5000));
   }
   // الإغلاق الوحيد: الخروج من الصفحة أو التطبيق
-  window.addEventListener('pagehide', function () { wantMic = false; userStopped = true; try { if (dict) dict.stop(); } catch (e) {} });
-  window.addEventListener('pageshow', function (e) { if (e.persisted) { userStopped = false; wantMic = true; reTries = 0; keepAlive('show'); } });
+  window.addEventListener('pagehide', function () { try { if (dict) dict.stop(); } catch (e) {} });
+  window.addEventListener('pageshow', function () { reTries = 0; keepAlive('show'); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { reTries = 0; keepAlive('visible'); } });
-  function flushBuf() {
-    var raw = buf.trim(); buf = ''; bufTimer = 0;
-    if (raw) handle(raw, false);
-  }
   $('#mic').addEventListener('click', function () {
     actx();
     if (!dict) return;
@@ -1569,15 +1924,26 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
     if (window.isSecureContext === false) return null; // الميكروفون يحتاج رابط https
     var rec = null, want = false, act = false, hp = [], hf = [], hs = [], tries = 0;
     function st(s, r) { hs.forEach(function (f) { f({ state: s, reason: r }); }); }
+    var IS_ANDROID = /Android/i.test(navigator.userAgent || '');
+    var lastIdx = -1, lastFin = '';
     function make(lang) {
       rec = new SR();
-      rec.lang = lang || 'ar-SA'; rec.continuous = true; rec.interimResults = true;
-      rec.onstart = function () { act = true; tries = 0; st('listening'); };
+      rec.lang = (lang && lang !== 'ar') ? lang : 'ar-SA'; rec.continuous = true; rec.interimResults = true;
+      try { rec.maxAlternatives = 3; } catch (x) {}
+      rec.onstart = function () { act = true; tries = 0; lastIdx = -1; lastFin = ''; st('listening'); };
       rec.onresult = function (e) {
         for (var i = e.resultIndex; i < e.results.length; i++) {
-          var r = e.results[i], tx = r[0].transcript;
-          if (r.isFinal) hf.forEach(function (f) { f({ text: tx + ' ' }); });
-          else hp.forEach(function (f) { f({ text: tx }); });
+          var r = e.results[i], tx = r[0].transcript, alts = [], a;
+          for (a = 0; a < r.length && a < 3; a++) alts.push(r[a].transcript);
+          if (r.isFinal) {
+            if (i <= lastIdx) continue;           // نتيجة نهائية وصلت من قبل (يحصل أحياناً على أندرويد)
+            lastIdx = i;
+            if (IS_ANDROID && lastFin && tx.indexOf(lastFin) === 0 && tx.length > lastFin.length) {
+              var rest = tx.slice(lastFin.length).trim(); lastFin = tx; tx = rest; alts = [rest];
+            } else lastFin = tx;
+            if (!tx.trim()) continue;
+            hf.forEach(function (f) { f({ text: tx + ' ', alts: alts }); });
+          } else hp.forEach(function (f) { f({ text: tx, alts: alts }); });
         }
       };
       rec.onerror = function (e) {
@@ -1588,7 +1954,15 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       };
       rec.onend = function () {
         act = false;
-        if (want && tries < 6) { tries++; setTimeout(function () { if (!want) return; try { rec.start(); } catch (x) { want = false; st('idle', 'stopped'); } }, 250); }
+        if (want && tries < 6) {
+          tries++;
+          setTimeout(function () {
+            if (!want) return;
+            try { rec.start(); } catch (x) {
+              setTimeout(function () { if (!want) return; try { rec.start(); } catch (y) { want = false; st('idle', 'stopped'); } }, 400);
+            }
+          }, 100);
+        }
         else if (want) { want = false; st('idle', 'time_limit'); }
         else st('idle', 'viewer_stopped');
       };
@@ -1617,12 +1991,8 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       dict = d;
       $('#mic').disabled = false;
       setMic('idle', 'اضغط الميكروفون ليسمعك ' + an() + '.');
-      d.onPartial(function (e) { if (e.text) heard(e.text + ' …'); });
-      d.onFinal(function (e) {
-        buf += e.text || '';
-        if (bufTimer) clearTimeout(bufTimer);
-        bufTimer = setTimeout(flushBuf, 1300);
-      });
+      d.onPartial(onPartialText);
+      d.onFinal(onFinalText);
       d.onState(function (e) {
         if (e.state === 'listening') { reTries = 0; dg.err = ''; }
         if (e.state === 'listening') setMic('listening', '' + an() + ' يسمعك. قل: «' + an() + ' سجل لنا كبوت».');
@@ -1637,6 +2007,7 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
             : why === 'unavailable' ? 'الاستماع غير متاح هنا.'
             : 'اضغط الميكروفون ليسمعك ' + an() + '.';
           setMic('idle', t);
+          uttDone = false; uttText = ''; wakeFlag = false; clearTimeout(partTimer); partTimer = 0;
           keepAlive(why);
         }
       });
@@ -1774,7 +2145,18 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       ['تراجع', 'أو «الغ آخر قيد».'],
       ['صكة جديدة', 'يطلب تأكيدك إذا الصكة ما انتهت. قل «تأكيد».'],
       ['كم النتيجة', 'يعرض المجموعين.'],
-      ['اسمك عبدالعزيز', 'يغيّر اسم المساعد لأي اسم تقوله. ناده بعدها بالاسم الجديد.']
+      ['اسمك عبدالعزيز', 'يغيّر اسم المساعد لأي اسم تقوله. ناده بعدها بالاسم الجديد.'],
+      ['كم باقي لنا', 'يعرض كم باقي للفوز. «كم باقي» لوحدها تعرض الفريقين.'],
+      [n + ' غيّر لون الخلفية إلى أزرق', 'أزرق، سماوي، أخضر، أحمر، برتقالي، بنفسجي، عنابي، وردي، بني، فحمي… وقل «ارجع للون الأساسي» لإرجاعها.'],
+      ['غيّر لونك إلى أخضر', 'يغيّر لون المساعد.'],
+      ['افتح الإعدادات', 'أو الحاسبة، الفرق، القوانين، المساعد. وقل «افتح القانون الثالث» لفتح قانون معيّن، و«التالي» و«السابق» للتنقل بينها.'],
+      ['غيّر اسم لنا إلى الصقور', 'يغيّر اسم أي فريق. وبعدها قل «سجل للصقور كبوت».'],
+      ['وقّف الخلفية المتحركة', 'أو «شغّل الخلفية المتحركة».'],
+      ['ارفع الصوت', 'أو «خفّض الصوت»، «الصوت على 50»، «اكتم المؤثرات»، «شغّل المؤثرات».'],
+      ['خلّ الشاشة شغالة', 'أو «الغ إبقاء الشاشة». وكذلك «وقّف الاهتزاز» و«شغّل الاهتزاز».'],
+      ['غيّر قيمة الكبوت في الصن إلى 50', 'يغيّر أي قيمة في الحساب (سرا، خمسين، مية، بلوت، قيد…). و«رجّع القيم» لإرجاعها.'],
+      ['صفّر الصكات', 'يصفّر عدد الصكات بعد أن تقول «تأكيد».'],
+      ['ما أحتاج أناديك', 'يستجيب لكل كلامك بدون نداء. وقل «لازم أناديك» لإرجاعه.']
     ];
     var ul = $('#cmds');
     ul.textContent = '';
@@ -1882,6 +2264,7 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
 
   /* ---------- tabs ---------- */
   function showView(v) {
+    curView = v;
     ['calc', 'teams', 'rules', 'abu', 'set'].forEach(function (k) { $('#v-' + k).hidden = (k !== v); });
     $$('.navbtn').forEach(function (b) {
       if (b.getAttribute('data-v') === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
