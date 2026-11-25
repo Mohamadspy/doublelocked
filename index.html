@@ -163,6 +163,9 @@ h2.h2 { margin: 28px 0 0; font-family: var(--font-display); font-weight: 700; fo
 }
 .tname:focus { border-bottom-color: var(--gold-soft); }
 .score { display: block; text-align: center; font: 700 64px/1 var(--font-body); color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+.clock { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 14px; color: var(--muted); font-size: 14px; }
+.clock b { color: var(--gold-soft); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .5px; }
+.clock[data-s="stop"] b { color: var(--ink); }
 .rem { text-align: center; color: var(--muted); font-size: 14px; line-height: 1.4; margin-top: -4px; }
 .bar { height: 6px; border-radius: 99px; background: var(--navy-950); overflow: hidden; }
 .bar i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .3s ease-out; }
@@ -479,6 +482,90 @@ h2.h2 { margin: 28px 0 0; font-family: var(--font-display); font-weight: 700; fo
   .bg .blob, .bg .suit, .mic[data-s="listening"] { animation-play-state: paused; }
   .bar i, #splash { transition: none; }
 }
+
+/* ===== ستايل زجاجي خفيف (Liquid Glass): طبقات شفافة بتمويه، وحواف لامعة، وزوايا كبيرة ===== */
+:root {
+  --g-fill: linear-gradient(135deg, rgba(255,255,255,.13) 0%, rgba(255,255,255,.045) 55%, rgba(255,255,255,.085) 100%);
+  --g-soft: rgba(255,255,255,.06);
+  --g-edge: rgba(255,255,255,.2);
+  --g-edge-soft: rgba(255,255,255,.11);
+  --g-shadow: inset 0 1px 0 rgba(255,255,255,.26), inset 0 -1px 0 rgba(255,255,255,.05), 0 10px 32px rgba(0,0,0,.28);
+  --g-blur: blur(16px) saturate(1.55);
+}
+.top, .abu, .team, .addpts, .preview {
+  background: var(--g-fill); border: 1px solid var(--g-edge); border-radius: 24px; box-shadow: var(--g-shadow);
+  -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+}
+.abu { border-color: color-mix(in srgb, var(--abu) 34%, var(--g-edge)); }
+.team.lead { border-color: color-mix(in srgb, var(--gold-soft) 75%, transparent); box-shadow: var(--g-shadow), 0 0 0 1px color-mix(in srgb, var(--gold-soft) 50%, transparent), 0 0 30px rgba(211,172,87,.16); }
+.preview { border-radius: 18px; }
+.abu-msg { background: rgba(0,0,0,.2); border-radius: 16px; }
+.pf input, .custom input, .field-in, .set-in, .vals input, .abu-in {
+  background: rgba(255,255,255,.07); border: 1px solid var(--g-edge-soft); border-radius: 14px; box-shadow: inset 0 1px 3px rgba(0,0,0,.28);
+}
+.bar { background: rgba(255,255,255,.1); }
+.bar i { background: linear-gradient(90deg, var(--gold), var(--gold-soft)); }
+.btn {
+  background: rgba(255,255,255,.07); border: 1px solid color-mix(in srgb, var(--gold) 55%, rgba(255,255,255,.2)); border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.btn--sm { border-radius: 13px; }
+.btn--solid, .regbtn, .custom button {
+  background: linear-gradient(180deg, #e6c473 0%, var(--gold) 100%); color: var(--navy-950); border: 1px solid rgba(255,255,255,.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 6px 18px rgba(184,137,43,.32);
+}
+.regbtn { border-radius: 18px; }
+.btn--danger { border-color: var(--no-line); color: var(--no-fg); background: rgba(138,46,59,.2); }
+.btn[data-armed] { background: var(--no-bg); border-color: var(--no-line); color: var(--no-fg); }
+.qbtn {
+  background: rgba(255,255,255,.08); border: 1.5px solid color-mix(in srgb, var(--gold) 70%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 4px 12px rgba(0,0,0,.25); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.mic { background: rgba(255,255,255,.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+.mic[data-s="standby"] { border-style: dashed; animation: standby 3.6s ease-in-out infinite; }
+@keyframes standby { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--abu) 0%, transparent); } 50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--abu) 14%, transparent); } }
+.rank, .mini { background: var(--g-soft); border-color: color-mix(in srgb, var(--gold) 70%, transparent); box-shadow: inset 0 1px 0 rgba(255,255,255,.2); }
+.chip--plain, .chip--ajab { background: var(--g-soft); }
+
+/* شريط التنقل: كبسولة زجاجية عائمة */
+.nav {
+  left: 10px; right: 10px; width: auto; max-width: 620px; margin-inline: auto;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px)); padding: 6px; border: 1px solid var(--g-edge); border-radius: 30px;
+  background: linear-gradient(135deg, rgba(255,255,255,.17), rgba(255,255,255,.06)); box-shadow: var(--g-shadow);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7); backdrop-filter: blur(22px) saturate(1.7);
+}
+.navbtn { background: transparent; border: 1px solid transparent; border-radius: 22px; }
+.navbtn[aria-current="page"] {
+  background: linear-gradient(180deg, #e6c473 0%, var(--gold) 100%); border-color: rgba(255,255,255,.35); color: var(--navy-950);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 4px 14px rgba(184,137,43,.3);
+}
+
+/* نافذة الفوز */
+#win { background: rgba(6,13,34,.5); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); }
+.wincard {
+  background: linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.05)); border: 1px solid color-mix(in srgb, var(--gold) 70%, rgba(255,255,255,.2));
+  border-radius: 30px; box-shadow: var(--g-shadow), 0 0 60px rgba(211,172,87,.18);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5); backdrop-filter: blur(20px) saturate(1.5);
+}
+
+/* العداد وسجل الحلات */
+.clock { width: fit-content; margin: 14px auto 0; padding: 6px 18px; border: 1px solid var(--g-edge-soft); border-radius: 999px; background: var(--g-soft); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
+.log { border-top: 0; }
+.log li.rnd {
+  display: block; margin-top: 10px; padding: 10px 14px 8px; border: 1px solid var(--g-edge-soft); border-radius: 18px; background: var(--g-soft);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+}
+.log .rn { color: var(--gold); font-size: 13px; font-weight: 700; line-height: 1.6; }
+.log .rr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 14px; align-items: baseline; padding: 3px 0; }
+.log .empty { padding: 10px 2px; }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .top, .abu, .team, .addpts, .preview, .nav, .wincard { background: color-mix(in srgb, var(--navy-900) 94%, transparent); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .top, .abu, .team, .addpts, .preview, .nav, .wincard, .btn, .qbtn, #win { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .top, .abu, .team, .addpts, .preview, .nav, .wincard { background: color-mix(in srgb, var(--navy-900) 94%, transparent); }
+}
 </style>
 
 <div id="root" lang="ar">
@@ -525,6 +612,8 @@ h2.h2 { margin: 28px 0 0; font-family: var(--font-display); font-weight: 700; fo
         <div class="abu-msg" id="abuMsg" aria-live="polite" data-init="1">ناده وقل: «أبو حميد سجل لنا كبوت»</div>
         <div class="abu-heard" id="abuHeard"></div>
       </section>
+
+      <div class="clock" id="clock" role="timer" aria-label="مدة الصكة"><span id="clockL">مدة الصكة</span><b id="clockT" dir="ltr">00:00</b></div>
 
       <div class="teams" style="margin-top:14px">
         <article class="team" data-t="0">
@@ -602,7 +691,7 @@ h2.h2 { margin: 28px 0 0; font-family: var(--font-display); font-weight: 700; fo
         <div class="sw-row" id="abuSw" role="group" aria-labelledby="abuLbl"></div>
       </div>
       <div class="preview" aria-hidden="true"><span class="dot"></span><b class="abu-nm">أبو حميد</b></div>
-      <label class="switch"><input type="checkbox" id="chkAuto"><span>يبدأ الاستماع مع بداية الصكة<small>يشتغل الميكروفون أول ما تدخل التطبيق، وتقدر توقفه بزر الميكروفون.</small></span></label>
+      <label class="switch"><input type="checkbox" id="chkAuto"><span>الاستعداد الدائم للنداء<small>مفعّل: يبقى المايك بانتظار ندائك فقط ولا يتصرف قبل أن تنادي الاسم، وتقدر تغلقه بزر الميكروفون. معطّل: يفتح عند الضغط على الميكروفون ويُغلق وحده بعد 20 ثانية صمت.</small></span></label>
       <label class="switch"><input type="checkbox" id="chkWake"><span>لا يستجيب إلا إذا ناديته باسمه<small>يمنع تسجيل كلام الجلسة العادي بالغلط.</small></span></label>
       <label class="switch"><input type="checkbox" id="chkSmart"><span>فهم ذكي بالذكاء الاصطناعي للأوامر الغامضة<small>يُستخدم فقط لما ما يفهم المساعد الأمر بنفسه، فيرسله إلى الذكاء الاصطناعي ليفهمه. مطفأ افتراضياً، ويطلب إذنك أول مرة، ويُحسب من استخدام حسابك.</small></span></label>
 
@@ -667,6 +756,7 @@ h2.h2 { margin: 28px 0 0; font-family: var(--font-display); font-weight: 700; fo
     <div class="win-team" id="winTeam"></div>
     <div class="win-score" id="winScore" dir="ltr"></div>
     <div class="win-lose" id="winLose"></div>
+    <div class="win-lose" id="winTime"></div>
     <div class="win-btns">
       <button class="btn btn--solid" id="winNew" type="button">صكة جديدة</button>
       <button class="btn" id="winUndo" type="button">تراجع عن آخر قيد</button>
@@ -863,13 +953,13 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   }
 
   var ITEMS = [
-    { k: 'kaboot', label: 'كبوت', re: /^(?:كبوت|قبوت|كابوت|كبوط|كبووت|كبود|قبود|كابت|قابوت)$/, def: 'sun' },
-    { k: 'arbaa', label: 'أربعمية', re: /^(?:اربعميه|اربعمايه|اربعمييه|اربعميت)$/, fix: 'sun' },
-    { k: 'balot', label: 'بلوت', re: /^(?:بلوت|بلات|بلوط|بلود|بالوت|بلوتو)$/, fix: 'hokm' },
-    { k: 'qeid', label: 'قيد', re: /^(?:قيد|قيده|قيدها|قيت|كيد|قايد)$/, def: 'sun' },
-    { k: 'sra', label: 'سرا', re: /^(?:سرا|سري|سره|سراء|سرع|صرا|سراه)$/, need: true },
-    { k: 'khamsin', label: 'خمسين', re: /^(?:خمسين|خمسون)$/, need: true, ctxOnly: true },
-    { k: 'miya', label: 'مية', re: /^(?:ميه|مايه|مييه|ميت)$/, need: true, ctxOnly: true }
+    { k: 'kaboot', label: 'كبوت', re: /^(?:ال)?(?:كبوت|قبوت|كابوت|كبوط|كبووت|كبود|قبود|كابت|قابوت)$/, def: 'sun' },
+    { k: 'arbaa', label: 'أربعمية', re: /^(?:ال)?(?:اربعميه|اربعمايه|اربعمييه|اربعميت)$/, fix: 'sun' },
+    { k: 'balot', label: 'بلوت', re: /^(?:ال)?(?:بلوت|بلات|بلوط|بلود|بالوت|بلوتو)$/, fix: 'hokm' },
+    { k: 'qeid', label: 'قيد', re: /^(?:ال)?(?:قيد|قيده|قيدها|قيت|كيد|قايد)$/, def: 'sun' },
+    { k: 'sra', label: 'سرا', re: /^(?:ال)?(?:سرا|سري|سره|سراء|سرع|صرا|سراه)$/, need: true },
+    { k: 'khamsin', label: 'خمسين', re: /^(?:ال)?(?:خمسين|خمسون)$/, need: true, ctxOnly: true },
+    { k: 'miya', label: 'مية', re: /^(?:ال)?(?:ميه|مايه|مييه|ميت)$/, need: true, ctxOnly: true }
   ];
   var RE_HOKM = /^(?:ب|ف|في|ل)?(?:ال)?حكم$/;
   var RE_SUN = /^(?:ب|ف)?(?:ال)?(?:صن|سن|صان|سان)$/;
@@ -926,7 +1016,35 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
     hits.forEach(function (h) { for (var z = h.s; z < h.s + h.n; z++) skip[z] = true; });
     for (k = 0; k < tk.length; k++) if (!skip[k]) rest.push(tk[k]);
     var teams = hits.map(function (h) { return h.t; }).filter(function (x, ix, arr) { return arr.indexOf(x) === ix; });
-    return { team: hits.length ? hits[0].t : null, vict: hits.length ? hits[0].v : false, both: teams.length > 1, tokens: rest };
+    return { team: hits.length ? hits[0].t : null, vict: hits.length ? hits[0].v : false, both: teams.length > 1, tokens: rest, hits: hits };
+  }
+
+  // «لنا 16 ولهم 10» أو «لنا سرا ولهم خمسين في الحكم» أو «16 لنا و10 لهم»: كل فريق بنقاطه، وتُسجَّل معاً في حلة واحدة
+  function parseBoth(tk, th, names) {
+    var hs = th.hits.slice().sort(function (a, b) { return a.s - b.s; }), segs = [], i, j;
+    function clean(a) { var o = a.slice(); while (o.length && (o[0] === 'و' || o[0] === 'سجل' || o[0] === 'اكتب')) o.shift(); while (o.length && o[o.length - 1] === 'و') o.pop(); return o; }
+    var after = hs.map(function (h, ix) { return clean(tk.slice(h.s + h.n, ix + 1 < hs.length ? hs[ix + 1].s : tk.length)); });
+    var allAfter = after.every(function (a) { return a.length > 0; });
+    if (allAfter) { for (i = 0; i < hs.length; i++) segs.push({ h: hs[i], tk: after[i] }); }
+    else {
+      var prev = 0;
+      for (i = 0; i < hs.length; i++) { segs.push({ h: hs[i], tk: clean(tk.slice(prev, hs[i].s)) }); prev = hs[i].s + hs[i].n; }
+      if (!segs.every(function (x) { return x.tk.length > 0; })) return null;
+    }
+    var all = tk.join(' '), uc = [];
+    tk.forEach(function (w) { var c = RE_HOKM.test(w) ? 'hokm' : RE_SUN.test(w) ? 'sun' : null; if (c && uc.indexOf(c) < 0) uc.push(c); });
+    var res = { intent: null, team: null, vict: false, both: false, entries: [], ctxTypes: uc.slice(), text: all };
+    for (i = 0; i < segs.length; i++) {
+      var sp = parse(segs[i].tk.join(' '), ['#', '#']);
+      if (!sp.entries.length) return null;
+      for (j = 0; j < sp.entries.length; j++) {
+        var e = sp.entries[j];
+        e.t = (segs[i].h.v && (e.key === 'kaboot' || e.key === 'qeid')) ? 1 - segs[i].h.t : segs[i].h.t;
+        if (e.needCtx && !e.ctx && uc.length === 1) { e.ctx = uc[0]; e.needCtx = false; }
+        res.entries.push(e);
+      }
+    }
+    return res;
   }
 
   function parse(raw, names) {
@@ -940,6 +1058,7 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
     if (HELP.test(t)) { res.intent = 'help'; return res; }
     var tk = splitW(t.split(' '));
     var th = detectTeams(tk, names);
+    if (th.both) { var bp = parseBoth(tk, th, names); if (bp) return bp; }
     res.team = th.team; res.vict = th.vict; res.both = th.both;
     tk = th.tokens;
     var ctx = [], hasCtx = false, i;
@@ -994,7 +1113,7 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
 
   /* ---------- state ---------- */
   var VALS_DEF = { sra: { hokm: 2, sun: 4 }, khamsin: { hokm: 5, sun: 10 }, miya: { hokm: 10, sun: 20 }, arbaa: { sun: 40 }, balot: { hokm: 2 }, kaboot: { hokm: 25, sun: 44 }, qeid: { hokm: 16, sun: 26 } };
-  var DEF = { names: ['لنا', 'لهم'], scores: [0, 0], wins: [0, 0], log: [], over: null, saved: ['لنا', 'لهم'], sfx: true, vol: 0.6, anim: true, abuAuto: true, abuWake: true, smart: false, vals: {}, dictLang: 'ar', bg: '#0a1634', abuColor: '#d3ac57', abuName: 'أبو حميد', target: 152, vibe: true, awake: false };
+  var DEF = { names: ['لنا', 'لهم'], scores: [0, 0], wins: [0, 0], log: [], over: null, saved: ['لنا', 'لهم'], sfx: true, vol: 0.6, anim: true, abuAuto: true, abuWake: true, smart: false, vals: {}, dictLang: 'ar', bg: '#0a1634', abuColor: '#d3ac57', abuName: 'أبو حميد', target: 152, vibe: true, awake: false, el: 0, run: null };
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function load() {
     try {
@@ -1005,6 +1124,8 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
         if (!Array.isArray(s.scores) || s.scores.length !== 2) s.scores = [0, 0];
         if (!Array.isArray(s.wins) || s.wins.length !== 2) s.wins = [0, 0];
         if (!Array.isArray(s.log)) s.log = [];
+        var rr = 0;   // سجل قديم بدون أرقام حلات: كل قيد يصير حلة
+        s.log.forEach(function (e) { if (typeof e.r !== 'number') e.r = ++rr; else if (e.r > rr) rr = e.r; });
         if (!Array.isArray(s.saved)) s.saved = clone(DEF.saved);
         if (!s.vals || typeof s.vals !== 'object') s.vals = {};
         if (typeof s.vol !== 'number') s.vol = 0.6;
@@ -1012,6 +1133,8 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
         if (!/^#[0-9a-f]{6}$/i.test(s.abuColor)) s.abuColor = DEF.abuColor;
         if (typeof s.abuName !== 'string' || !s.abuName.trim() || s.abuName.length > 14) s.abuName = DEF.abuName;
         if (typeof s.target !== 'number' || !(s.target >= 20 && s.target <= 500)) s.target = 152;
+        if (typeof s.el !== 'number' || !(s.el >= 0)) s.el = 0;
+        s.run = null; // جلسة سابقة انتهت بدون حفظ: لا نحسب وقتها
         return s;
       }
     } catch (e) {}
@@ -1191,25 +1314,59 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   }
   function buzz() { try { if (S.vibe && navigator.vibrate) navigator.vibrate(12); } catch (e) {} }
 
-  function add(t, p, label, quiet) {
+  /* ---------- عداد الصكة: يبدأ مع الصكة ويقف عند الفوز، ولا يحسب إلا وقت فتح التطبيق ---------- */
+  function clockMs() { return S.el + (S.run !== null ? Date.now() - S.run : 0); }
+  function clockStart() { if (S.over === null && S.run === null) { S.run = Date.now(); save(); } }
+  function clockPause() { if (S.run !== null) { S.el += Date.now() - S.run; S.run = null; save(); } }
+  function fmtClock(ms) {
+    var s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    return (h ? h + ':' + p(m) : p(m)) + ':' + p(x);
+  }
+  function clockRender() {
+    var over = S.over !== null;
+    $('#clockT').textContent = fmtClock(clockMs());
+    $('#clock').setAttribute('data-s', over ? 'stop' : (S.run !== null ? 'run' : 'pause'));
+    $('#clockL').textContent = over ? 'مدة الصكة (انتهت)' : 'مدة الصكة';
+    $('#winTime').textContent = over ? 'مدة الصكة: ' + fmtClock(S.el) : '';
+  }
+  setInterval(clockRender, 1000);
+
+  /* ---------- الحلات: كل تسجيل (فريق أو فريقين معاً) يُحفظ في حلة واحدة ---------- */
+  var ROUND_W = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة', 'الحادية عشرة', 'الثانية عشرة', 'الثالثة عشرة', 'الرابعة عشرة', 'الخامسة عشرة', 'السادسة عشرة', 'السابعة عشرة', 'الثامنة عشرة', 'التاسعة عشرة', 'العشرون'];
+  function roundName(n) { return 'الحلة ' + (ROUND_W[n - 1] || n); }
+  function nextRound() { var m = 0; S.log.forEach(function (e) { if (e.r > m) m = e.r; }); return m + 1; }
+  function roundCount() { var seen = {}, c = 0; S.log.forEach(function (e) { if (!seen[e.r]) { seen[e.r] = 1; c++; } }); return c; }
+  // list: [{ t: فريق, p: نقاط, label }]. الفوز يُفحص مرة واحدة بعد إضافة نقاط الفريقين معاً
+  function addRound(list, quiet) {
     if (S.over !== null) return false;
-    p = Math.round(p);
-    if (!(p > 0 && p <= 300)) return false;
-    if (!quiet) { sfx('add', p); buzz(); }
-    S.scores[t] += p;
-    S.log.push({ t: t, p: p, total: S.scores[t], n: label || '' });
+    var rid = nextRound(), did = false, top = 0;
+    list.forEach(function (x) {
+      var p = Math.round(x.p);
+      if (!(p > 0 && p <= 300)) return;
+      S.scores[x.t] += p;
+      S.log.push({ t: x.t, p: p, total: S.scores[x.t], n: x.label || '', r: rid });
+      did = true; if (p > top) top = p;
+    });
+    if (!did) return false;
+    if (!quiet) { sfx('add', top); buzz(); }
     var w = winner();
     if (w !== null) {
-      S.over = w; S.wins[w] += 1;
+      S.over = w; S.wins[w] += 1; clockPause();
       save(); render(); showWin(w, true);
     } else { save(); render(); }
     return true;
   }
+  function add(t, p, label, quiet) { return addRound([{ t: t, p: p, label: label }], quiet); }
   function undo() {
-    var e = S.log.pop();
-    if (!e) return false;
-    S.scores[e.t] -= e.p;
-    if (S.over !== null) { S.wins[S.over] = Math.max(0, S.wins[S.over] - 1); S.over = null; }
+    var last = S.log[S.log.length - 1];
+    if (!last) return false;
+    var rid = last.r;
+    while (S.log.length && S.log[S.log.length - 1].r === rid) {   // يلغي الحلة كاملة
+      var e = S.log.pop();
+      S.scores[e.t] -= e.p;
+    }
+    if (S.over !== null) { S.wins[S.over] = Math.max(0, S.wins[S.over] - 1); S.over = null; clockStart(); }
     $('#win').hidden = true;
     confettiStop();
     sfx('undo');
@@ -1218,12 +1375,14 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   }
   function newGame() {
     S.scores = [0, 0]; S.log = []; S.over = null;
+    S.el = 0; S.run = null; clockStart();
     $('#win').hidden = true;
     confettiStop();
     sfx('click');
     save(); render();
   }
   function showWin(w, celebrate) {
+    clockRender();
     $('#winTeam').textContent = nm(w);
     $('#winScore').textContent = S.scores[w] + ' - ' + S.scores[1 - w];
     $('#winLose').textContent = 'وحظ أوفر للخسرانين ' + nm(1 - w);
@@ -1256,15 +1415,28 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       em.textContent = 'لم يُسجَّل شيء بعد. اضغط على أحد أزرار القيد، أو ناد ' + an() + '.';
       ol.appendChild(em);
     }
-    for (var i = S.log.length - 1; i >= 0; i--) {
-      var e = S.log[i], li = document.createElement('li');
-      var a = document.createElement('span'); a.className = 'who'; a.textContent = nm(e.t);
-      if (e.n) { var sm = document.createElement('small'); sm.textContent = e.n; a.appendChild(sm); }
-      var b = document.createElement('span'); b.className = 'pts'; b.dir = 'ltr'; b.textContent = '+' + e.p;
-      var c = document.createElement('span'); c.className = 'tot'; c.dir = 'ltr'; c.textContent = e.total;
-      li.appendChild(a); li.appendChild(b); li.appendChild(c);
+    var groups = [];
+    S.log.forEach(function (e) {
+      var g = groups[groups.length - 1];
+      if (g && g.r === e.r) g.items.push(e); else groups.push({ r: e.r, items: [e] });
+    });
+    for (var gi = groups.length - 1; gi >= 0; gi--) {
+      var li = document.createElement('li'), hd = document.createElement('div');
+      li.className = 'rnd';
+      hd.className = 'rn'; hd.textContent = roundName(gi + 1);
+      li.appendChild(hd);
+      groups[gi].items.forEach(function (e) {
+        var row = document.createElement('div'); row.className = 'rr';
+        var a = document.createElement('span'); a.className = 'who'; a.textContent = nm(e.t);
+        if (e.n) { var sm = document.createElement('small'); sm.textContent = e.n; a.appendChild(sm); }
+        var b = document.createElement('span'); b.className = 'pts'; b.dir = 'ltr'; b.textContent = '+' + e.p;
+        var c = document.createElement('span'); c.className = 'tot'; c.dir = 'ltr'; c.textContent = e.total;
+        row.appendChild(a); row.appendChild(b); row.appendChild(c);
+        li.appendChild(row);
+      });
       ol.appendChild(li);
     }
+    clockRender();
     renderSaved();
   }
 
@@ -1294,10 +1466,12 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   });
   $('#addpts').addEventListener('submit', function (e) {
     e.preventDefault();
+    var list = [];
     [0, 1].forEach(function (k) {
       var inp = $('#cust' + k), v = parseInt(toLatin(inp.value), 10);
-      if (v > 0) { add(k, v, ''); inp.value = ''; }
+      if (v > 0) { list.push({ t: k, p: v, label: '' }); inp.value = ''; }
     });
+    if (list.length) addRound(list);   // الفريقان معاً = حلة واحدة
   });
   $('#undo').addEventListener('click', undo);
   $('#winUndo').addEventListener('click', undo);
@@ -1401,10 +1575,13 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       msg('حكم أم صن؟', 'ask'); sfx('ask'); return;
     }
     if (S.over !== null) { msg('الصكة انتهت. قل «صكة جديدة» أو «تراجع».', 'warn'); sfx('err'); return; }
-    var done = [];
+    var done = [], valid = [];
     r.list.forEach(function (x) {
-      if (add(x.t, x.p, x.label, true)) done.push(nm(x.t) + ': ' + (x.label ? x.label + ' ' : '') + '+' + x.p);
+      var pp = Math.round(x.p);
+      if (pp > 0 && pp <= 300) { valid.push(x); done.push(nm(x.t) + ': ' + (x.label ? x.label + ' ' : '') + '+' + pp); }
     });
+    if (valid.length) addRound(valid, true);   // كل ما قاله في أمر واحد = حلة واحدة
+    else done = [];
     if (!done.length) { msg('ما قدرت أسجل شيء. جرّب رقماً بين 1 و300.', 'warn'); sfx('err'); return; }
     buzz();
     if (S.over === null) { sfx('chime'); }
@@ -1773,13 +1950,17 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   }
   function stableMs(t) {
     var tk = norm(t).split(' '), last = tk[tk.length - 1] || '';
-    return (numTok(last) || /^\d+$/.test(last)) ? 750 : 380;
+    if (numTok(last) || /^\d+$/.test(last)) {
+      var pl = parse(t, [nm(0), nm(1)]);   // رقم مجرد لفريق: قد يتبعه «ولهم 10» فننتظر أكثر ليدخلا حلة واحدة
+      return (pl.entries.length && pl.entries.every(function (e) { return !e.key; })) ? 1400 : 750;
+    }
+    return 380;
   }
   function onPartialText(e) {
     var t = bestText(e);
     if (!t) return;
-    heard(t + ' …');
     var now = Date.now();
+    if (gateOpen(norm(t))) { heard(t + ' …'); lastAct = now; }
     if (!wakeFlag && S.abuWake && wakeHas(norm(t))) {
       wakeFlag = true; attn = now + 12000;
       if (now - ackAt > 1500) { ackAt = now; sfx('wake'); msg('تفضل، أسمعك…', 'ask'); }
@@ -1914,9 +2095,26 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
     var on = false;
     try { on = dict.active(); } catch (e) {}
     // المايك لا يُغلق بالضغط: يبقى مفتوحاً حتى تخرج من التطبيق
-    if (on) { msg('المايك يبقى مفتوحاً ما دمت داخل التطبيق.', 'ok'); }
-    else { userStopped = false; wantMic = true; reTries = 0; sfx('micon'); startDict(); }
+    if (on) { userStopped = true; wantMic = false; micLive = false; try { dict.stop(); } catch (e) {} setMic('idle', 'أغلقت المايك. اضغط عليه أو شغّله من جديد.'); msg('أغلقت المايك.', 'ok'); sfx('click'); }
+    else { userStopped = false; wantMic = true; reTries = 0; attn = Date.now() + 20000; lastAct = Date.now(); sfx('micon'); startDict(); }
   });
+  /* وضع الاستعداد: المايك يسمع الاسم فقط ولا يتصرف إلا بعد ندائك. وإذا عطّلت «الاستعداد الدائم» يُغلق وحده بعد 20 ثانية صمت */
+  var micLive = false, lastAct = 0, lastShown = '';
+  setInterval(function () {
+    if (!micLive || !dict) return;
+    var now = Date.now(), standby = S.abuWake && now >= attn && !(pending && now < pending.exp);
+    var k = standby ? 'standby' : 'listening';
+    if (k !== lastShown) {
+      lastShown = k;
+      setMic(k, standby ? an() + ' بانتظار ندائك. قل «' + an() + '»…' : an() + ' يسمعك. قل أمرك.');
+      if (standby) heard('');
+    }
+    if (!S.abuAuto && now - lastAct > 20000 && !(pending && now < pending.exp)) {
+      userStopped = true; wantMic = false; micLive = false; lastShown = '';
+      try { dict.stop(); } catch (e) {}
+      setMic('idle', 'أغلق المايك لعدم وجود كلام. اضغط عليه ليسمعك ' + an() + '.');
+    }
+  }, 500);
   // outside claude.ai there is no dictation capability: fall back to the browser's own speech recognition (Chrome, Edge, Safari)
   function webSpeech() {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1994,8 +2192,8 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
       d.onPartial(onPartialText);
       d.onFinal(onFinalText);
       d.onState(function (e) {
-        if (e.state === 'listening') { reTries = 0; dg.err = ''; }
-        if (e.state === 'listening') setMic('listening', '' + an() + ' يسمعك. قل: «' + an() + ' سجل لنا كبوت».');
+        micLive = e.state === 'listening';
+        if (e.state === 'listening') { reTries = 0; dg.err = ''; lastShown = ''; lastAct = Date.now(); setMic('listening', '' + an() + ' يسمعك. قل: «' + an() + ' سجل لنا كبوت».'); }
         else if (e.state === 'starting') setMic('starting', 'يفتح الميكروفون…');
         else if (e.state === 'finishing') setMic('finishing', 'ينهي الاستماع…');
         else {
@@ -2371,6 +2569,7 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   function enter() {
     if (entered) return; entered = true;
     // pressing «ابدأ» is the gesture that lets sound and the microphone start
+    clockStart();
     if (S.abuAuto) { wantMic = true; userStopped = false; reTries = 0; if (dict) startDict(); }
     actx();
     placeSplash();
@@ -2395,6 +2594,10 @@ var ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخ
   placeSplash();
   startEmbers();
   if (S.over !== null) showWin(S.over, false);
+  // العداد لا يحسب إلا وقت فتح التطبيق
+  document.addEventListener('visibilitychange', function () { if (!entered) return; if (document.hidden) clockPause(); else clockStart(); clockRender(); });
+  window.addEventListener('pagehide', clockPause);
+  window.addEventListener('pageshow', function () { if (entered) { clockStart(); clockRender(); } });
 })();
 </script>
 
